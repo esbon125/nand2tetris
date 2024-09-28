@@ -1,0 +1,25 @@
+digraph G {
+
+    /* Entities */
+    node[fontname="Arial"]
+    A [label="Von Neumann Architecture"]
+    B[label="Memory"]
+    C[label="CPU"]
+    D[label="Data"]
+    E[label="Program"]
+    F[label="ALU"]
+    G[label="Registers"]
+    ROM[shape=square]
+    RAM[shape=square]
+    /* Relationships */
+    A->{B,C} 
+    B->C[label="buses"]
+    C->B[label="control\ndata\nadresses"]
+   B->{D,E}
+   C->{F,G}
+   E->ROM
+    D->RAM
+   /* Ranks*/
+       { rank=same; B C };
+    
+    }

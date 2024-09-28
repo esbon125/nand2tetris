@@ -1,0 +1,31 @@
+\documentclass{article}
+\title{Screen indexing - Low Level I/O}
+\author{Esteban Bustamante}
+
+\begin{document}
+\maketitle
+\section*{Considerations:}
+\begin{enumerate}
+    \item  We have, due to our hardware a max numbers of bits per word.
+    \item  Thus, to know how many words will take to have all the rows with our max number of bits per word, we simply:
+    $$WpR=\frac{Width\cdot Height}{BpW\cdot Height} $$
+\begin{center}
+    Where: $BpW=$ Bits per Word and $ WpR=$ Words per row
+\end{center}
+\item Then, if we exactly want to manipulate one exact bit, we do the following 3 steps:
+\begin{itemize}
+    \item $word=RAM[offset+WpR*row+col/BpW] $(to obtain the word location)
+    \item $ word[col\%BpW]=$ (set the exact bit within the word to 1, with modulo operation)
+    \item Commit $word$ to the data memory (RAM).
+\end{itemize}
+\end{enumerate}
+\section*{Hack Programming}
+\begin{enumerate}
+    \item Registers and memory: add, data and control operations, op codes A:0, C=1;
+    \item Branching: conditional statements. Labels between brackets
+    \item Variables: declaration with @, no labels.
+    \item Iteration: using jump operations.
+    \item Pointers: 
+    \item Input/Output
+\end{enumerate}
+\end{document}

@@ -1,0 +1,23 @@
+CHIP And16to1{
+
+IN a[16], n;
+OUT out[16];
+
+PARTS:
+And(a=a[0], b=n, out=out[0]);
+    And(a=a[1], b=n, out=out[1]);
+    And(a=a[2], b=n, out=out[2]);
+    And(a=a[3], b=n, out=out[3]);            
+    And(a=a[4], b=n, out=out[4]);
+    And(a=a[5], b=n, out=out[5]);
+    And(a=a[6], b=n, out=out[6]);
+    And(a=a[7], b=n, out=out[7]);
+    And(a=a[8], b=n, out=out[8]);
+    And(a=a[9], b=n, out=out[9]);
+    And(a=a[10], b=n, out=out[10]);
+    And(a=a[11], b=n, out=out[11]);
+    And(a=a[12], b=n, out=out[12]);
+    And(a=a[13], b=n, out=out[13]);
+    And(a=a[14], b=n, out=out[14]);
+    And(a=a[15], b=n, out=out[15]);
+}

@@ -1,0 +1,102 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/05/CPU.hdl
+
+/**
+ * The Hack CPU (Central Processing unit), consisting of an ALU,
+ * two registers named A and D, and a program counter named PC.
+ * The CPU is designed to fetch and execute instructions written in 
+ * the Hack machine language. In particular, functions as follows:
+ * Executes the inputted instruction according to the Hack machine 
+ * language specification. The D and A in the language specification
+ * refer to CPU-resident registers, while M refers to the external
+ * memory location addressed by A, i.e. to Memory[A]. The inM input 
+ * holds the value of this location. If the current instruction needs 
+ * to write a value to M, the value is placed in outM, the address 
+ * of the target location is placed in the addressM output, and the 
+ * writeM control bit is asserted. (When writeM==0, any value may 
+ * appear in outM). The outM and writeM outputs are combinational: 
+ * they are affected instantaneously by the execution of the current 
+ * instruction. The addressM and pc outputs are clocked: although they 
+ * are affected by the execution of the current instruction, they commit 
+ * to their new values only in the next time step. If reset==1 then the 
+ * CPU jumps to address 0 (i.e. pc is set to 0 in next time step) rather 
+ * than to the address resulting from executing the current instruction. 
+ */
+
+CHIP CPU {
+
+    IN  inM[16],         // M value input  (M = contents of RAM[A])
+        instruction[16], // Instruction for execution
+        reset;           // Signals whether to re-start the current
+                         // program (reset==1) or continue executing
+                         // the current program (reset==0).
+
+    OUT outM[16],        // M value output
+        writeM,          // Write to M? 
+        addressM[15],    // Address in data memory (of M)
+        pc[15];          // address of next instruction
+
+    PARTS:
+
+    //Decodification of instruction
+            
+            
+            And16(a=instruction, b[0..14]=false,b[15]=true, out=temp1);
+            Or16Way(in=temp1, out=opcode);
+            //op-code for first Mux
+            And16(a=instruction, b[0..4]=false,b[6..15]=false,b[5]=true, out=temp2);
+            Or16Way(in=temp2, out=DestA);
+        //destination bit for A-Register
+        
+        
+        And16(a=instruction, b[0..3]=false,b[5..15]=false,b[4]=true, out=temp4);
+            Or16Way(in=temp4, out=DestD);
+            Mux(a=false, b=DestD, sel=opcode, out=selD);
+            
+        DRegister(in=outM2, load=selD, out=inALU1); //D-Register
+
+            //D-Register destination bit
+        
+
+    Mux16(a=instruction, b=outM2, sel=opcode, out=outMuxinA); //1st Mux for A-Register
+    
+    Mux(a=true, b=DestA, sel=opcode, out=selA); //Mux for A-Register load bit
+    ARegister(in=outMuxinA, load=selA, out=outA,out[15]=false,out[0..14]=addressM);//A-Register 
+
+    Mux16(a=outA, b=inM, sel=instruction[12], out=inALU2); //Mux for 2nd ALU input
+
+    
+    
+
+    ALU(x=inALU1, y=inALU2, zx=instruction[11], nx=instruction[10], zy=instruction[9], ny=instruction[8], f=instruction[7], no=instruction[6], out=outM,out=outM2, zr=zr, ng=ng); //ALU
+
+//PC
+    And16(a=instruction, b[0..1]=false,b[3..15]=false,b[2]=true, out=tempJ1);
+            Or16Way(in=tempJ1, out=j1);
+            And16(a=instruction, b[0]=false,b[2..15]=false,b[1]=true, out=tempJ2);
+            Or16Way(in=tempJ2, out=j2);
+            And16(a=instruction, b[0]=true,b[1..15]=false, out=tempJ3);
+            Or16Way(in=tempJ3, out=j3);
+    //Decodification of jump bits
+    And(a=j2, b=zr, out=term1load);
+    And(a=j1, b=ng, out=term2load);
+    Not(in=ng, out=notng);
+    Not(in=zr,out=notzr);
+    And(a=j3, b=notng, out=tempload1);
+    And(a=tempload1, b=notzr, out=term3load);
+    Or(a=term1load, b=term2load, out=tempload);
+    Or(a=tempload, b=term3load, out=load);
+    
+     //load bit computation for PC 
+    Mux(a=false, b=load, sel=opcode, out=loadPC);
+    
+    PC(in=outA, load=loadPC, inc=true, reset=reset,out[15]=false, out[0..14]=pc); 
+    //Program Counter
+                        
+    
+            Mux(a=false, b=instruction[3], sel=opcode, out=writeM);
+    //Destination bit for Data Memory        
+        
+}
